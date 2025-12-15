@@ -1,4 +1,3 @@
-import sys
 # Імпортуємо нову функцію розрахунку
 from logic import calculate_pyramidal_sum
 
