@@ -7,10 +7,9 @@ def run_console_app():
     print(" Ряд: 1, 3, 6, 10... (суми трикутних чисел)")
     print(" Введіть 'q' або 'exit' щоб вийти.")
     print("==========================================")
-
     while True:
         try:
-            user_input = input("\nВведіть число n: ").strip()
+            user_input = input("\nВведіть ЧИСЛО n: ").strip()
 
             # Перевірка на команду виходу
             if user_input.lower() in ['q', 'exit']:
