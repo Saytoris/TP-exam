@@ -21,10 +21,5 @@ RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
 
 # 6. Копіюємо код програми
 COPY . .
-
-# 7. Відкриваємо порт для веб-застосунку
-EXPOSE 5000
-
-# 8. Команда запуску за замовчуванням (Веб-сервер)
-# Використовуємо python3 явно
+#7. Запуск середовища python та в ньому фалу cli.py
 CMD ["python3", "cli.py"]
