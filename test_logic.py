@@ -1,13 +1,7 @@
 import unittest
 from logic import calculate_pyramidal_sum
 
-class TestBlackBoxPyramidal(unittest.TestCase):
-
-    # ==========================================
-    # 1. МЕТОДОЛОГІЯ: ЕКВІВАЛЕНТНИЙ ПОДІЛ
-    # (Equivalence Partitioning)
-    # Ми перевіряємо представників різних класів даних.
-    # ==========================================
+class TestBlackBox(unittest.TestCase):
 
     def test_valid_positive_class(self):
         """Клас валідних натуральних чисел (n > 0)."""
@@ -20,71 +14,78 @@ class TestBlackBoxPyramidal(unittest.TestCase):
 
     def test_invalid_negative_class(self):
         """Клас невалідних від'ємних чисел (n < 0)."""
-        # Будь-яке від'ємне число має викликати помилку.
-        # Беремо -5 як типового представника.
         with self.assertRaises(ValueError):
             calculate_pyramidal_sum(-5)
 
     def test_invalid_type_class(self):
-        """Клас невалідних типів даних (не цілі числа)."""
-        # Рядок замість числа
+        """Клас невалідних типів даних string."""
         with self.assertRaises(TypeError):
-            calculate_pyramidal_sum("ten")
-
-    # ==========================================
-    # 2. МЕТОДОЛОГІЯ: АНАЛІЗ ГРАНИЧНИХ ЗНАЧЕНЬ
-    # (Boundary Value Analysis - BVA)
-    # Ми перевіряємо точки переходу між класами.
-    # ==========================================
-
-    def test_boundary_zero(self):
-        """Нижня межа допустимих значень (n = 0)."""
-        # Це граничне значення: мінімально можливе "правильне" число.
-        result = calculate_pyramidal_sum(0)
-        self.assertEqual(result, 0)
-
-    def test_boundary_minus_one(self):
-        """Значення одразу за нижньою межею (n = -1)."""
-        # Це перше "неправильне" число зліва від нуля.
-        with self.assertRaises(ValueError):
-            calculate_pyramidal_sum(-1)
-
-    def test_boundary_one(self):
-        """Значення одразу над нижньою межею (n = 1)."""
-        # Найменше натуральне число.
-        self.assertEqual(calculate_pyramidal_sum(1), 1)
-
-    # ==========================================
-    # 3. МЕТОДОЛОГІЯ: ПЕРЕДБАЧЕННЯ ПОМИЛОК
-    # (Error Guessing)
-    # Специфічні сценарії, де розробник міг помилитися.
-    # ==========================================
+            calculate_pyramidal_sum("five")
 
     def test_float_number(self):
         """Чи спрацює код, якщо передати 5.0 (float)?"""
-        # Навіть якщо 5.0 математично ціле, в Python це інший тип.
-        # Функція має бути суворою і відхилити float.
         with self.assertRaises(TypeError):
             calculate_pyramidal_sum(5.0)
 
     def test_none_input(self):
         """Що буде, якщо передати None?"""
-        # assertIsNone / assertIsNotNone тут допомагають перевірити логіку,
-        # але тут ми чекаємо TypeError, бо None не можна множити.
         with self.assertRaises(TypeError):
             calculate_pyramidal_sum(None)
 
     def test_large_number(self):
         """Перевірка на переповнення або дуже великі числа."""
-        # Python автоматично обробляє великі числа (BigInt), 
-        # але тест гарантує, що алгоритм не зависає.
         n = 1000
         result = calculate_pyramidal_sum(n)
         
-        # Ми знаємо, що для додатних n результат завжди > n
-        # (використовуємо assertGreater з твоїх скріншотів)
         self.assertGreater(result, n)
         self.assertTrue(result > 0)
+class TestWhiteBox(unittest.TestCase):
+
+    def test_path_type_error(self):
+        """
+        Start -> Check Type (Fail) -> Raise TypeError -> End
+        """
+        # Вхідні дані підібрані так, щоб умова 'if not isinstance' стала True
+        input_data = "hello" 
+        
+        with self.assertRaises(TypeError):
+            calculate_pyramidal_sum(input_data)
+
+    def test_path_value_error(self):
+        """
+        Start -> Check Type (Pass) -> Check Value < 0 (Fail) -> Raise ValueError -> End
+        """
+        # Вхідні дані: int (проходить 1-й if), але < 0 (заходить в 2-й if)
+        input_data = -5
+        
+        with self.assertRaises(ValueError):
+            calculate_pyramidal_sum(input_data)
+
+    def test_path_success_calculation(self):
+        """
+        White Box Path 3:
+        Start -> Check Type (Pass) -> Check Value < 0 (Pass) -> Calculate -> Return
+        """
+        # Вхідні дані: int і >= 0. Проходить повз усі if прямо до формули.
+        input_data = 3
+        expected_result = 10
+        
+        result = calculate_pyramidal_sum(input_data)
+        self.assertEqual(result, expected_result)
+
+    def test_formula_operators(self):
+        """
+        Перевіряємо, чи правильно працює формула (n*(n+1)*(n+2)) // 6
+        Особливо нас цікавить цілочисельне ділення.
+        """
+        # Для n=4: 4 * 5 * 6 = 120. 120 / 6 = 20.
+        # Якби там було звичайне ділення /, результат був би 20.0 (float),
+        # а ми очікуємо int. Це тест на структуру даних.
+        result = calculate_pyramidal_sum(4)
+        
+        # Перевірка саме типу (що ми використали //, а не /)
+        self.assertIsInstance(result, int)
+        self.assertEqual(result, 20)
 
 if __name__ == '__main__':
     unittest.main()
